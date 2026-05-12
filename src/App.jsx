@@ -201,8 +201,8 @@ export default function App() {
       {/* ── Header ─────────────────────────────────────────────────── */}
       <header className={styles.header}>
         <div>
-          <span className={styles.logo}>🪙 Seeonium</span>
-          <div className={styles.logoSub}>La plateforme de paris fictifs entre amis</div>
+          <span className={styles.logo}>Polyscout26</span>
+          <div className={styles.logoSub}>La plateforme de paris</div>
         </div>
         {currentUser && (
           <nav className={styles.nav}>
@@ -234,7 +234,7 @@ export default function App() {
           <div className={styles.authHero}>
             <div className={styles.authEmoji}>🪙</div>
             <h1 className={styles.authTitle}>Seeonium</h1>
-            <p className={styles.authSub}>Parie avec de la monnaie fictive entre amis</p>
+            <p className={styles.authSub}>Parie avec de la monnaie fictive</p>
           </div>
 
           <div className={styles.tabs}>
@@ -260,7 +260,7 @@ export default function App() {
                     placeholder="••••••••" onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
                 </div>
                 <button className={styles.primaryBtn} style={{ width: '100%' }} onClick={handleLogin}>Se connecter</button>
-                <p className={styles.hint}>Admin → pseudo: <strong>admin</strong> / mdp: <strong>admin123</strong></p>
+                <p className={styles.hint}></p>
               </>
             ) : (
               <>
