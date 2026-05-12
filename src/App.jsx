@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { loadData, saveData, KEYS } from './storage.js';
-import './index.css';
+import styles from './index.css';
+
 
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'admin123';
