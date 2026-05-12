@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { loadData, saveData, KEYS } from './storage.js';
-import style from'./index.css';
+import styles from'./index.css';
 
 
 
