@@ -3,6 +3,7 @@ import { loadData, saveData, KEYS } from './storage.js';
 import styles from './index.css';
 
 
+
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'admin123';
 const STARTING_BALANCE = 1000;
