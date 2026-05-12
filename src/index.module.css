@@ -21,16 +21,6 @@
   --success-bg: #DCFCE7;
   --radius: 10px;
   --radius-sm: 7px;
-
-  /* GitHub Primer variables for new React component */
-  --color-background-primary: #FFFFFF;
-  --color-background-secondary: #F3F2EF;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #6B6B6B;
-  --color-border-tertiary: rgba(0, 0, 0, 0.1);
-  --color-border-secondary: rgba(0, 0, 0, 0.15);
-  --color-border-danger: #FCA5A5;
-  --color-text-danger: #DC2626;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,21 +36,11 @@
     --gold-dark: #FAC75A;
     --danger-bg: #3B0D0D;
     --success-bg: #052E16;
-
-    /* GitHub Primer dark mode variables */
-    --color-background-primary: #1C1C1B;
-    --color-background-secondary: #242422;
-    --color-text-primary: #F0EFE9;
-    --color-text-secondary: #9A9A90;
-    --color-border-tertiary: rgba(255, 255, 255, 0.1);
-    --color-border-secondary: rgba(255, 255, 255, 0.15);
-    --color-border-danger: #7F1D1D;
-    --color-text-danger: #FCA5A5;
   }
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Georgia', serif, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -80,7 +60,7 @@ input, select, textarea {
   padding: 9px 12px;
   width: 100%;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -95,14 +75,8 @@ button {
   transition: opacity 0.15s, transform 0.1s;
 }
 
-button:hover { 
-  opacity: 0.85; 
-}
-
-button:active { 
-  transform: scale(0.98); 
-}
-
+button:hover { opacity: 0.85; }
+button:active { transform: scale(0.98); }
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -131,10 +105,665 @@ button:disabled {
   animation: spin 0.9s linear infinite;
 }
 
-/* Responsive design utilities */
+/* ─── Main Layout ─── */
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ─── Header ─── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0 12px;
+  border-bottom: 2px solid var(--gold);
+  margin-bottom: 24px;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: bold;
+  color: var(--gold);
+  letter-spacing: -0.5px;
+}
+
+.logoSub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navBtn {
+  background: none;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.navBtn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.navBtnActive {
+  background: var(--gold);
+  color: white;
+  border-color: var(--gold);
+}
+
+.balance {
+  background: var(--gold-light);
+  color: var(--gold-dark);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid var(--gold);
+}
+
+.adminBadge {
+  background: #EDE9FE;
+  color: #5B21B6;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid #A78BFA;
+}
+
+.logoutBtn {
+  background: none;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background: var(--danger-bg);
+}
+
+/* ─── Cards & Sections ─── */
+.card {
+  background: var(--bg-card);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 0 16px;
+  color: var(--text);
+}
+
+/* ─── Forms ─── */
+.field {
+  margin-bottom: 14px;
+}
+
+.label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.primaryBtn {
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.primaryBtn:hover {
+  opacity: 0.9;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryBtn {
+  background: none;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.secondaryBtn:hover {
+  background: var(--gold-light);
+}
+
+.dangerBtn {
+  background: none;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.dangerBtn:hover {
+  background: var(--danger-bg);
+}
+
+.removeBtn {
+  background: none;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.removeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Auth ─── */
+.authWrap {
+  max-width: 420px;
+  margin: 40px auto 0;
+}
+
+.authHero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.authEmoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.authTitle {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.authSub {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 0.5px solid var(--border-strong);
+  margin-bottom: 0;
+}
+
+.tab {
+  padding: 8px 20px;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  background: var(--bg-secondary);
+  border: none;
+  border-bottom: 0.5px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+}
+
+.tabActive {
+  background: var(--bg-card);
+  border-bottom: 0.5px solid var(--bg-card);
+  color: var(--gold);
+  font-weight: bold;
+}
+
+.authCard {
+  background: var(--bg-card);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 0 12px 12px 12px;
+  margin-top: 0;
+  padding: 24px 20px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* ─── Page Layout ─── */
+.page {
+  animation: fadeIn 0.3s;
+}
+
+.pageHeader {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  color: var(--text);
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.filterBtnActive {
+  background: var(--gold);
+  color: white;
+  border-color: var(--gold);
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty span {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* ─── Bet Cards ─── */
+.betCard {
+  background: var(--bg-card);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  transition: border-color 0.2s;
+}
+
+.betCard:hover {
+  border-color: var(--gold);
+}
+
+.betCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.betTitle {
+  margin: 8px 0 4px;
+  font-size: 17px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.betDesc {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.tag {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.poolBox {
+  margin-left: 12px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.poolLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.poolValue {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.optionsGrid {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.optionCard {
+  border: 1px solid var(--border-strong);
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: all 0.2s;
+}
+
+.optionWinner {
+  border: 1px solid #22C55E;
+  background: #F0FDF4;
+}
+
+.optionName {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.optionOdds {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.optionPct {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.winnerBadge {
+  font-size: 11px;
+  color: #15803D;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+.myWager {
+  background: var(--gold-light);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: var(--gold-dark);
+}
+
+.wonLabel {
+  color: var(--success);
+  margin-left: 8px;
+}
+
+.lostLabel {
+  color: var(--danger);
+  margin-left: 8px;
+}
+
+.wagerRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.wagerRow select {
+  flex: 1;
+  min-width: 120px;
+}
+
+.wagerRow input {
+  width: 100px;
+}
+
+.betMeta {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ─── Leaderboard ─── */
+.leaderRow {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.leaderRow:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  width: 32px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.leaderName {
+  flex: 1;
+  font-weight: normal;
+  margin-left: 8px;
+  color: var(--text);
+}
+
+.leaderBalance {
+  font-weight: bold;
+  color: var(--gold);
+}
+
+/* ─── Admin ─── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.statCard {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.statEmoji {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.statValue {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.optionRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.optionRow input {
+  padding: 8px 12px;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.adminActions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.adminActions span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.playersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.playerCard {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.playerCard div:first-child {
+  flex: 1;
+}
+
+.playerCard div:first-child > div:first-child {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.playerCard div:first-child > div:last-child {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.playerCard div:last-child {
+  font-weight: bold;
+  color: var(--gold);
+  font-size: 14px;
+}
+
+/* ─── Toast Notification ─── */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 300px;
+  animation: fadeInDown 0.3s;
+}
+
+/* ─── Responsive ─── */
 @media (max-width: 768px) {
-  body {
-    font-size: 14px;
+  .wrapper {
+    padding: 0 12px 20px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .nav {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .optionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .wagerRow {
+    flex-direction: column;
+  }
+
+  .wagerRow select,
+  .wagerRow input {
+    width: 100%;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .playersGrid {
+    grid-template-columns: 1fr;
   }
 
   input, select, textarea {
