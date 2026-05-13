@@ -172,6 +172,18 @@ export default function App() {
   const leaderboard     = Object.entries(users)
     .map(([username, data]) => ({ username, balance: data.balance }))
     .sort((a, b) => b.balance - a.balance);
+  const totalWagered    = wagers.reduce((s, w) => s + w.amount, 0);
+  const recentActivity  = [...wagers]
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, 5)
+    .map((w) => {
+      const bet = bets.find((b) => b.id === w.betId);
+      return {
+        ...w,
+        betTitle: bet?.title || 'Paris supprimé',
+        option: bet?.options?.[w.optionIndex] || 'Option',
+      };
+    });
 
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER
@@ -179,7 +191,7 @@ export default function App() {
 
   if (view === 'loading') return (
     <div className={styles.center} style={{ minHeight: '100vh' }}>
-      <div className="spinner" />
+      <div className={styles.spinner} />
       <p style={{ color: 'var(--text-secondary)', marginTop: 12, fontSize: 14 }}>Chargement...</p>
     </div>
   );
@@ -200,9 +212,12 @@ export default function App() {
 
       {/* ── Header ─────────────────────────────────────────────────── */}
       <header className={styles.header}>
-        <div>
-          <span className={styles.logo}>Polyscout26</span>
-          <div className={styles.logoSub}>La plateforme de paris</div>
+        <div className={styles.brand}>
+          <div className={styles.coinMark}>S</div>
+          <div>
+            <span className={styles.logo}>Seeonium</span>
+            <div className={styles.logoSub}>La monnaie fictive entre amis</div>
+          </div>
         </div>
         {currentUser && (
           <nav className={styles.nav}>
@@ -290,94 +305,127 @@ export default function App() {
       ══════════════════════════════════════════════════════════════ */}
       {view === 'home' && currentUser && !currentUser.isAdmin && (
         <div className={styles.page}>
-          <div className={styles.pageHeader}>
-            <h2 className={styles.pageTitle}>Paris disponibles</h2>
-            <div className={styles.filters}>
-              {['open', 'closed', 'resolved', 'all'].map((f) => (
-                <button key={f} onClick={() => setBetFilter(f)}
-                  className={`${styles.filterBtn} ${betFilter === f ? styles.filterBtnActive : ''}`}>
-                  {{ open: 'Ouverts', closed: 'Fermés', resolved: 'Résolus', all: 'Tous' }[f]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {getFilteredBets().length === 0 && (
-            <div className={styles.empty}>
-              <span>🎲</span>
-              <p>Aucun paris {betFilter !== 'all' ? `"${betFilter}"` : ''}.<br />L'admin doit en créer !</p>
-            </div>
-          )}
-
-          {getFilteredBets().map((bet) => {
-            const betWagers = wagers.filter((w) => w.betId === bet.id);
-            const totalPool = betWagers.reduce((s, w) => s + w.amount, 0);
-            const myWager   = getUserWager(bet.id);
-            const tag       = TAG_CONFIG[bet.status];
-
-            return (
-              <div key={bet.id} className={styles.betCard}>
-                <div className={styles.betCardTop}>
-                  <div style={{ flex: 1 }}>
-                    <span className={styles.tag} style={{ background: tag.bg, color: tag.color }}>{tag.label}</span>
-                    <h3 className={styles.betTitle}>{bet.title}</h3>
-                    {bet.description && <p className={styles.betDesc}>{bet.description}</p>}
-                  </div>
-                  <div className={styles.poolBox}>
-                    <div className={styles.poolLabel}>Cagnotte</div>
-                    <div className={styles.poolValue}>{totalPool.toLocaleString('fr-FR')} 🪙</div>
-                  </div>
-                </div>
-
-                <div className={styles.optionsGrid} style={{ gridTemplateColumns: `repeat(${bet.options.length}, 1fr)` }}>
-                  {bet.options.map((opt, i) => {
-                    const ow  = betWagers.filter((w) => w.optionIndex === i);
-                    const ot  = ow.reduce((s, w) => s + w.amount, 0);
-                    const pct = totalPool > 0 ? Math.round((ot / totalPool) * 100) : 0;
-                    const isWin = bet.resolvedOption === i;
-                    return (
-                      <div key={i} className={`${styles.optionCard} ${isWin ? styles.optionWinner : ''}`}>
-                        <div className={styles.optionName}>{opt}</div>
-                        <div className={styles.optionOdds}>x{bet.odds[i]}</div>
-                        <div className={styles.optionPct}>{pct}% · {ot.toLocaleString('fr-FR')} 🪙</div>
-                        {isWin && <div className={styles.winnerBadge}>✓ GAGNANT</div>}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {myWager && (
-                  <div className={styles.myWager}>
-                    ✓ Ta mise : <strong>{myWager.amount} 🪙</strong> sur <strong>"{bet.options[myWager.optionIndex]}"</strong>
-                    {bet.status === 'resolved' && (
-                      myWager.optionIndex === bet.resolvedOption
-                        ? <span className={styles.wonLabel}>🎉 +{Math.floor(myWager.amount * bet.odds[myWager.optionIndex])} 🪙 gagnés !</span>
-                        : <span className={styles.lostLabel}>😢 Perdu</span>
-                    )}
-                  </div>
-                )}
-
-                {bet.status === 'open' && !myWager && (
-                  <div className={styles.wagerRow}>
-                    <select value={wagerForm[bet.id]?.option ?? ''} style={{ flex: 2 }}
-                      onChange={(e) => setWagerForm((f) => ({ ...f, [bet.id]: { ...f[bet.id], option: e.target.value } }))}>
-                      <option value="">Choisir une option...</option>
-                      {bet.options.map((opt, i) => <option key={i} value={i}>{opt} (x{bet.odds[i]})</option>)}
-                    </select>
-                    <input type="number" min="1" max={getUserBalance()} placeholder="Mise 🪙" style={{ flex: 1, minWidth: 90 }}
-                      value={wagerForm[bet.id]?.amount ?? ''}
-                      onChange={(e) => setWagerForm((f) => ({ ...f, [bet.id]: { ...f[bet.id], amount: e.target.value } }))} />
-                    <button className={styles.primaryBtn} onClick={() => handleWager(bet.id)}>Miser</button>
-                  </div>
-                )}
-
-                <div className={styles.betMeta}>
-                  Créé le {fmtDate(bet.createdAt)} · {betWagers.length} parieur{betWagers.length !== 1 ? 's' : ''}
-                  {bet.closesAt && bet.status === 'open' && ` · Ferme le ${fmtDate(bet.closesAt)}`}
+          <div className={styles.dashboardGrid}>
+            <main className={styles.mainColumn}>
+              <div className={styles.pageHeader}>
+                <h2 className={styles.pageTitle}>Paris disponibles</h2>
+                <div className={styles.filters}>
+                  {['open', 'closed', 'resolved', 'all'].map((f) => (
+                    <button key={f} onClick={() => setBetFilter(f)}
+                      className={`${styles.filterBtn} ${betFilter === f ? styles.filterBtnActive : ''}`}>
+                      {{ open: 'Ouverts', closed: 'Fermés', resolved: 'Résolus', all: 'Tous' }[f]}
+                    </button>
+                  ))}
                 </div>
               </div>
-            );
-          })}
+
+              {getFilteredBets().length === 0 && (
+                <div className={styles.empty}>
+                  <span>🎲</span>
+                  <p>Aucun paris {betFilter !== 'all' ? `"${betFilter}"` : ''}.<br />L'admin doit en créer !</p>
+                </div>
+              )}
+
+              {getFilteredBets().map((bet) => {
+                const betWagers = wagers.filter((w) => w.betId === bet.id);
+                const totalPool = betWagers.reduce((s, w) => s + w.amount, 0);
+                const myWager   = getUserWager(bet.id);
+                const tag       = TAG_CONFIG[bet.status];
+
+                return (
+                  <div key={bet.id} className={styles.betCard}>
+                    <div className={styles.betCardTop}>
+                      <div style={{ flex: 1 }}>
+                        <span className={styles.tag} style={{ background: tag.bg, color: tag.color }}>{tag.label}</span>
+                        <h3 className={styles.betTitle}>{bet.title}</h3>
+                        {bet.description && <p className={styles.betDesc}>{bet.description}</p>}
+                      </div>
+                      <div className={styles.poolBox}>
+                        <div className={styles.poolLabel}>Cagnotte totale</div>
+                        <div className={styles.poolValue}>{totalPool.toLocaleString('fr-FR')} 🪙</div>
+                      </div>
+                    </div>
+
+                    <div className={styles.optionsGrid} style={{ gridTemplateColumns: `repeat(${bet.options.length}, 1fr)` }}>
+                      {bet.options.map((opt, i) => {
+                        const ow  = betWagers.filter((w) => w.optionIndex === i);
+                        const ot  = ow.reduce((s, w) => s + w.amount, 0);
+                        const pct = totalPool > 0 ? Math.round((ot / totalPool) * 100) : 0;
+                        const isWin = bet.resolvedOption === i;
+                        return (
+                          <div key={i} className={`${styles.optionCard} ${isWin ? styles.optionWinner : ''}`}>
+                            <div className={styles.optionName}>{opt}</div>
+                            <div className={styles.optionOdds}>x{bet.odds[i]}</div>
+                            <div className={styles.optionBar}><span style={{ width: `${pct}%` }} /></div>
+                            <div className={styles.optionPct}>{pct}% · {ot.toLocaleString('fr-FR')} 🪙</div>
+                            {isWin && <div className={styles.winnerBadge}>✓ GAGNANT</div>}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {myWager && (
+                      <div className={styles.myWager}>
+                        🏆 Ta mise : <strong>{myWager.amount} 🪙</strong> sur <strong>"{bet.options[myWager.optionIndex]}"</strong>
+                        {bet.status === 'resolved' && (
+                          myWager.optionIndex === bet.resolvedOption
+                            ? <span className={styles.wonLabel}>🎉 +{Math.floor(myWager.amount * bet.odds[myWager.optionIndex])} 🪙 gagnés !</span>
+                            : <span className={styles.lostLabel}>Perdu</span>
+                        )}
+                      </div>
+                    )}
+
+                    {bet.status === 'open' && !myWager && (
+                      <div className={styles.wagerRow}>
+                        <select value={wagerForm[bet.id]?.option ?? ''} style={{ flex: 2 }}
+                          onChange={(e) => setWagerForm((f) => ({ ...f, [bet.id]: { ...f[bet.id], option: e.target.value } }))}>
+                          <option value="">Choisir une option...</option>
+                          {bet.options.map((opt, i) => <option key={i} value={i}>{opt} (x{bet.odds[i]})</option>)}
+                        </select>
+                        <input type="number" min="1" max={getUserBalance()} placeholder="Mise 🪙" style={{ flex: 1, minWidth: 90 }}
+                          value={wagerForm[bet.id]?.amount ?? ''}
+                          onChange={(e) => setWagerForm((f) => ({ ...f, [bet.id]: { ...f[bet.id], amount: e.target.value } }))} />
+                        <button className={styles.primaryBtn} onClick={() => handleWager(bet.id)}>Miser</button>
+                      </div>
+                    )}
+
+                    <div className={styles.betMeta}>
+                      Créé le {fmtDate(bet.createdAt)} · {betWagers.length} parieur{betWagers.length !== 1 ? 's' : ''}
+                      {bet.closesAt && bet.status === 'open' && ` · Ferme le ${fmtDate(bet.closesAt)}`}
+                    </div>
+                  </div>
+                );
+              })}
+            </main>
+
+            <aside className={styles.sideColumn}>
+              <div className={styles.sideCard}>
+                <h3 className={styles.sideTitle}>🏆 Classement</h3>
+                {leaderboard.slice(0, 5).map((u, i) => (
+                  <div key={u.username} className={`${styles.compactLeader} ${u.username === currentUser.username ? styles.compactLeaderActive : ''}`}>
+                    <span>{i + 1}</span>
+                    <strong>{u.username}</strong>
+                    <em>{u.balance.toLocaleString('fr-FR')} 🪙</em>
+                  </div>
+                ))}
+                <button className={styles.sideButton} onClick={() => setView('leaderboard')}>Voir tout le classement</button>
+              </div>
+
+              <div className={styles.sideCard}>
+                <h3 className={styles.sideTitle}>Activité récente</h3>
+                {recentActivity.length === 0 && <p className={styles.sideEmpty}>Aucune mise récente.</p>}
+                {recentActivity.map((a) => (
+                  <div key={a.id} className={styles.activityRow}>
+                    <span>↗</span>
+                    <div>
+                      <strong>{a.username}</strong> a misé {a.amount} 🪙
+                      <small>{a.option}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </aside>
+          </div>
         </div>
       )}
 
@@ -415,7 +463,7 @@ export default function App() {
             {[
               { label: 'Paris créés',   value: bets.length,                              emoji: '🎲' },
               { label: 'Joueurs',       value: Object.keys(users).length,                emoji: '👥' },
-              { label: 'Mises placées', value: wagers.length,                            emoji: '💰' },
+              { label: 'Seeonium misés', value: totalWagered.toLocaleString('fr-FR'),     emoji: '💰' },
               { label: 'Paris ouverts', value: bets.filter((b) => b.status === 'open').length, emoji: '✅' },
             ].map((s) => (
               <div key={s.label} className={styles.statCard}>
