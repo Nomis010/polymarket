@@ -9,9 +9,9 @@ const fmtDate = (ts) =>
   });
 
 const TAG_CONFIG = {
-  open:     { label: 'Ouvert',  bg: '#DCFCE7', color: '#166534' },
-  closed:   { label: 'Fermé',   bg: '#F1F5F9', color: '#475569' },
-  resolved: { label: 'Résolu',  bg: '#FEF9C3', color: '#854D0E' },
+  open:     { label: 'Ouvert',  bg: 'rgba(124, 58, 237, 0.15)', color: '#9d6bff' },
+  closed:   { label: 'Fermé',   bg: 'rgba(140,145,180,0.12)',   color: '#8c91b4' },
+  resolved: { label: 'Résolu',  bg: 'rgba(52, 211, 153, 0.1)',  color: '#34d399' },
 };
 const QUOTE_RESERVE = 100;
 
@@ -234,44 +234,83 @@ export default function App() {
       {/* ── Notification toast ─────────────────────────────────────── */}
       {notif && (
         <div className={styles.toast} style={{
-          background: notif.type === 'error' ? 'var(--danger-bg)' : 'var(--success-bg)',
-          color:      notif.type === 'error' ? 'var(--danger)'    : 'var(--success)',
-          borderColor: notif.type === 'error' ? '#FCA5A5'         : '#6EE7B7',
+          background: notif.type === 'error' ? 'rgba(225,91,114,0.12)' : 'rgba(52,211,153,0.1)',
+          color:      notif.type === 'error' ? '#e15b72'               : '#34d399',
+          borderColor: notif.type === 'error' ? 'rgba(225,91,114,0.3)' : 'rgba(52,211,153,0.3)',
         }}>
           {notif.msg}
         </div>
       )}
 
-      {/* ── Header ─────────────────────────────────────────────────── */}
-      <header className={styles.header}>
-        <div className={styles.brand}>
-          <div className={styles.coinMark}>S</div>
-          <div>
-            <span className={styles.logo}>Seeonium</span>
-            <div className={styles.logoSub}>La monnaie fictive entre amis</div>
+      {/* ── Sidebar ─────────────────────────────────────────────────── */}
+      {currentUser && (
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarBrand}>
+            <div className={styles.coinMark}>S</div>
           </div>
-        </div>
-        {currentUser && (
-          <nav className={styles.nav}>
+
+          {!currentUser.isAdmin && (
+            <div className={styles.sidebarBalance}>
+              <span>{getUserBalance()?.toLocaleString('fr-FR')}</span>
+              <span className={styles.coinIcon}>🪙</span>
+            </div>
+          )}
+          {currentUser.isAdmin && (
+            <div className={styles.sidebarBalance} style={{ fontSize: 13 }}>
+              <span>⚙ Admin</span>
+            </div>
+          )}
+
+          <nav className={styles.sidebarNav}>
             {!currentUser.isAdmin && (
-              <span className={styles.balance}>{getUserBalance()?.toLocaleString('fr-FR')} 🪙</span>
+              <button className={`${styles.sideNavBtn} ${view === 'home' ? styles.sideNavBtnActive : ''}`} onClick={() => setView('home')}>
+                <span className={styles.sideNavIcon}>🏠</span>
+                <span>Paris</span>
+              </button>
+            )}
+            {!currentUser.isAdmin && (
+              <button className={`${styles.sideNavBtn} ${view === 'myBets' ? styles.sideNavBtnActive : ''}`} onClick={() => setView('home')}>
+                <span className={styles.sideNavIcon}>📋</span>
+                <span>Mes paris</span>
+              </button>
+            )}
+            {!currentUser.isAdmin && (
+              <button className={`${styles.sideNavBtn} ${view === 'leaderboard' ? styles.sideNavBtnActive : ''}`} onClick={() => setView('leaderboard')}>
+                <span className={styles.sideNavIcon}>👑</span>
+                <span>Classement</span>
+              </button>
+            )}
+            {!currentUser.isAdmin && (
+              <button className={`${styles.sideNavBtn}`} onClick={() => {}}>
+                <span className={styles.sideNavIcon}>🕐</span>
+                <span>Historique</span>
+              </button>
+            )}
+            {!currentUser.isAdmin && (
+              <button className={`${styles.sideNavBtn}`} onClick={() => {}}>
+                <span className={styles.sideNavIcon}>👤</span>
+                <span>Profil</span>
+              </button>
             )}
             {currentUser.isAdmin && (
-              <span className={styles.adminBadge}>⚙ Admin</span>
+              <button className={`${styles.sideNavBtn} ${styles.sideNavBtnActive}`} onClick={() => setView('admin')}>
+                <span className={styles.sideNavIcon}>⚙</span>
+                <span>Gestion</span>
+              </button>
             )}
-            {!currentUser.isAdmin && (
-              <button className={`${styles.navBtn} ${view === 'home' ? styles.navBtnActive : ''}`} onClick={() => setView('home')}>Paris</button>
-            )}
-            {!currentUser.isAdmin && (
-              <button className={`${styles.navBtn} ${view === 'leaderboard' ? styles.navBtnActive : ''}`} onClick={() => setView('leaderboard')}>🏆 Classement</button>
-            )}
-            {currentUser.isAdmin && (
-              <button className={`${styles.navBtn} ${styles.navBtnActive}`} onClick={() => setView('admin')}>Gestion</button>
-            )}
-            <button className={styles.logoutBtn} onClick={handleLogout}>Déconnexion</button>
           </nav>
-        )}
-      </header>
+
+          <div className={styles.sidebarFooter}>
+            <button className={styles.logoutBtn} onClick={handleLogout}>
+              <span className={styles.sideNavIcon}>🚪</span>
+              <span>Déconnexion</span>
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* ── Main area ────────────────────────────────────────────────── */}
+      <div className={currentUser ? styles.mainArea : ''}>
 
       {/* ══════════════════════════════════════════════════════════════
           LOGIN / REGISTER
@@ -345,7 +384,7 @@ export default function App() {
             <div className={styles.pageHeader}>
               <h2 className={styles.pageTitle}>Paris disponibles</h2>
               <div className={styles.filters}>
-                {['open', 'closed', 'resolved', 'all'].map((f) => (
+                {['all', 'open', 'closed', 'resolved'].map((f) => (
                   <button key={f} onClick={() => setBetFilter(f)}
                     className={`${styles.filterBtn} ${betFilter === f ? styles.filterBtnActive : ''}`}>
                     {{ open: 'Ouverts', closed: 'Fermés', resolved: 'Résolus', all: 'Tous' }[f]}
@@ -419,7 +458,7 @@ export default function App() {
                       <input type="number" min="1" max={getUserBalance()} placeholder="Mise 🪙" style={{ flex: 1, minWidth: 90 }}
                         value={wagerForm[bet.id]?.amount ?? ''}
                         onChange={(e) => setWagerForm((f) => ({ ...f, [bet.id]: { ...f[bet.id], amount: e.target.value } }))} />
-                      <button className={styles.primaryBtn} onClick={() => handleWager(bet.id)}>Miser</button>
+                      <button className={styles.primaryBtn} onClick={() => handleWager(bet.id)}>MISER</button>
                     </div>
                   )}
 
@@ -594,6 +633,7 @@ export default function App() {
         </div>
       )}
 
+      </div>{/* end mainArea */}
     </div>
   );
 }
